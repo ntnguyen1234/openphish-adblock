@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from time import sleep
 from urllib.parse import urlsplit
 
-from utils import load_json, load_text, write_json, write_text
+from utils import clean_split, load_json, load_text, write_json, write_text
 
 
 def craft_url(url: str) -> str:
@@ -18,8 +18,7 @@ def craft_url(url: str) -> str:
     if '.html' in (url_path := f'{split_url.path}{url_query}'):
         url_path = url_path.split('.html')[0] + '.html'
 
-    if len(url_path) > 1:
-        url_block += url_path.rstrip('~')
+    url_block += next(clean_split(url_path, '[*$]')).rstrip('~!')
     
     return domain, url_block.rstrip('/')
 
@@ -41,11 +40,19 @@ def main():
     subprocess.run([ddl_cmd, '-i', 'feed.txt', '--export', 'dead_domains.txt'])
 
     filters_dict = load_json('filters.json')
-    whitelist = []
-    for whitelist_url in load_text('whitelist.txt', True):
-        for url in filters_dict.keys():
+
+    ignore_urls = set(load_text('ignore.txt', True))
+    whitelist_txt = list(load_text('whitelist.txt', True))
+    whitelist = set()
+    for url in filters_dict.keys():
+        if url in ignore_urls:
+            whitelist.add(url)
+            continue
+        
+        for whitelist_url in whitelist_txt:
+            if whitelist_url.startswith('!'): continue
             if whitelist_url not in url: continue
-            whitelist.append(url)
+            whitelist.add(url)
     
     for url in whitelist:
         filters_dict.pop(url, None)
