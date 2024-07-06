@@ -15,8 +15,11 @@ def craft_url(url: str) -> str:
     url_query = ''
     url_block = (domain := split_url.netloc.split(':')[0]).removeprefix('www.')
 
-    if len(url_path := f'{split_url.path}{url_query}') > 1:
-        url_block += url_path
+    if '.html' in (url_path := f'{split_url.path}{url_query}'):
+        url_path = url_path.split('.html')[0] + '.html'
+
+    if len(url_path) > 1:
+        url_block += url_path.rstrip('~')
     
     return domain, url_block.rstrip('/')
 
@@ -67,6 +70,16 @@ def main():
     
     write_json(filters_dict, 'filters.json')
     write_text(yield_filter(), 'filters_init.txt')
+
+    text_list = []
+    for line in load_text('filters.txt', True):
+        if 'Last modified' in line:
+            text_list.append(f'! Last modified: {dt}')
+        elif 'filters_init.txt' in line:
+            text_list.append(f'\n{line}')
+        else:
+            text_list.append(line)
+    write_text(text_list, 'filters.txt')
     exit()
 
 if __name__ == "__main__":

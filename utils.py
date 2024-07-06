@@ -17,9 +17,11 @@ def clean_split(text: str, seps: str, verbose: bool = False):
         if (item := part.strip()):
             yield item
 
+
 def load_json(file_path) -> list | dict:
     with open(file_path, 'r', encoding='utf-8') as fr:
         return orjson.loads(fr.read())
+
 
 def load_text(file_path, is_list: bool = False):
     with open(file_path, 'r', encoding='utf-8') as fr:
