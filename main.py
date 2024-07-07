@@ -46,15 +46,15 @@ def main():
 
     subprocess.run([ddl_cmd, '-i', 'feed.txt', '--export', 'dead_domains.txt'])
 
-    filters_dict = load_json('feeds.json')
+    feeds = load_json('feeds.json')
     
     for url in load_text('ignore.txt', True):
-        filters_dict.pop(url, None)
+        feeds.pop(url, None)
 
     # ignore_urls = set(load_text('ignore.txt', True))
     # whitelist = set()
     # whitelist_txt = list(load_text('whitelist.txt', True))
-    # for url in filters_dict.keys():
+    # for url in feeds.keys():
     #     if url in ignore_urls:
     #         whitelist.add(url)
     #         continue
@@ -63,27 +63,27 @@ def main():
     #         if whitelist_url not in url: continue
     #         whitelist.add(url)    
     # for url in whitelist:
-    #     filters_dict.pop(url, None)
+    #     feeds.pop(url, None)
 
     dt = datetime.now(timezone.utc).isoformat(timespec='milliseconds')
 
     dead_domains = set(load_text('dead_domains.txt', True))
     for url in load_text('feed.txt', True):
         if craft_url(url)[0] in dead_domains:
-            filters_dict.pop(url, None)
+            feeds.pop(url, None)
             continue
         
-        filters_dict[url] = dt
+        feeds[url] = dt
     
     filters_set = set()
     def yield_filter():
-        for url in filters_dict.keys():
+        for url in feeds.keys():
             if (url_block := craft_url(url)[1]) in filters_set: continue
 
             filters_set.add(url_block)
             yield f'||{url_block}^$document,subdocument,popup'
     
-    write_json(filters_dict, 'feeds.json')
+    write_json(feeds, 'feeds.json')
     write_text(yield_filter(), 'filters_init.txt')
 
     text_list = []
