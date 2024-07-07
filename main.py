@@ -25,9 +25,9 @@ def craft_url(url: str) -> str:
     if '.php' in url_path:
         url_path = url_path.split('.php')[0] + '.php'
 
-    url_block += next(clean_split(url_path, '[*$]')).rstrip('~!')
+    url_block += next(clean_split(url_path, '[*$]')).rstrip('.~!')
     
-    return domain, url_block.rstrip('/~')
+    return domain, url_block.rstrip('.~!/')
 
 def main():
     req = urllib.request.Request('https://openphish.com/feed.txt', method='GET')
@@ -95,7 +95,8 @@ def main():
         else:
             text_list.append(line)
     write_text(text_list, 'filters.txt')
-    exit()
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
+        sleep(3600)

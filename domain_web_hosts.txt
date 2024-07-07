@@ -1,4 +1,5 @@
 .cf-ipfs.com
+.cprapid.com
 .gitbook.io
 .glitch.me
 .ipfs.dweb.link
@@ -11,4 +12,6 @@
 .wixsite.com
 .wixstudio.io
 .workers.dev
+delivery.attempt.failure.ebbs.co.za
 hergunavantaj.com.tr
+support-5.ru
